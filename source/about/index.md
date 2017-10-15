@@ -30,6 +30,6 @@ type: about
 
 <center>(3)[个人博客](http://jimmy9876.top)</center>
 
-<center><span color="red">**如果我的文章节省了你的时间，欢迎赏根🍭**</span></center>
+<!-- <center><span color="red">**如果我的文章节省了你的时间，欢迎赏根🍭**</span></center>
 
-<center>![](https://ws4.sinaimg.cn/large/006tKfTcgy1ffxir8dmk2j30yi1auq7v.jpg)</center>
+<center>![](https://ws4.sinaimg.cn/large/006tKfTcgy1ffxir8dmk2j30yi1auq7v.jpg)</center> -->
