@@ -6,8 +6,6 @@ comments: false
 sidebar: custom
 ---
 
-<h1><center>关于我</center></h1>
-
 <center>我是*Jimmy*</center>
 
 <center>目前就读于南京邮电大学</center>
