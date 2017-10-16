@@ -1,7 +1,9 @@
 ---
-title:
-date: 2017-05-26 15:59:54
-type: about
+title: 关于
+description: 个人简介
+layout: about
+comments: false
+sidebar: custom
 ---
 
 <h1><center>关于我</center></h1>

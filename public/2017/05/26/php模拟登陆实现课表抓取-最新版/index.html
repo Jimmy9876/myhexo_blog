@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>php模拟登陆实现课表抓取(最新版) | Hexo</title>
+  <meta name="description" content="首先，简单的说下表单原理，当我们在正方输入学号、密码、验证码的时候，点击提交按钮会产生一个POST请求，服务器在接受到POST请求以后，检查提交的学号密码验证码是否正确，正确则登陆成功。  环境：Mac+MAMP Pro+phpstorm(PHP7.1)+Chrome 1、抓包打开谷歌浏览器访问学校教务处网址，打开开发者工具选择network，之后在正方里填上你的学号，密码，验证码，登录，看看这">
+<meta name="keywords" content="php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php模拟登陆实现课表抓取(最新版)">
+<meta property="og:url" content="http://jimmy9876.top/2017/05/26/php模拟登陆实现课表抓取-最新版/index.html">
+<meta property="og:site_name" content="Jimmy&#39;s Blog">
+<meta property="og:description" content="首先，简单的说下表单原理，当我们在正方输入学号、密码、验证码的时候，点击提交按钮会产生一个POST请求，服务器在接受到POST请求以后，检查提交的学号密码验证码是否正确，正确则登陆成功。  环境：Mac+MAMP Pro+phpstorm(PHP7.1)+Chrome 1、抓包打开谷歌浏览器访问学校教务处网址，打开开发者工具选择network，之后在正方里填上你的学号，密码，验证码，登录，看看这">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://i1.piimg.com/588926/fa6f6f661397058c.jpg">
+<meta property="og:image" content="http://i1.piimg.com/588926/e2468014006c83be.jpg">
+<meta property="og:image" content="http://i4.buimg.com/588926/7d45a6e1eff2d946.jpg">
+<meta property="og:image" content="http://i4.buimg.com/588926/eda145ce10fe2f0a.png">
+<meta property="og:image" content="http://i4.buimg.com/588926/fad605f358e06ff5.png">
+<meta property="og:updated_time" content="2017-10-16T07:16:33.212Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="php模拟登陆实现课表抓取(最新版)">
+<meta name="twitter:description" content="首先，简单的说下表单原理，当我们在正方输入学号、密码、验证码的时候，点击提交按钮会产生一个POST请求，服务器在接受到POST请求以后，检查提交的学号密码验证码是否正确，正确则登陆成功。  环境：Mac+MAMP Pro+phpstorm(PHP7.1)+Chrome 1、抓包打开谷歌浏览器访问学校教务处网址，打开开发者工具选择network，之后在正方里填上你的学号，密码，验证码，登录，看看这">
+<meta name="twitter:image" content="http://i1.piimg.com/588926/fa6f6f661397058c.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://jimmy9876.top/2017/05/26/php模拟登陆实现课表抓取-最新版/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jimmy&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <!-- font-awesome CSS -->
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+    
+    
+
+</head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/jimmy9876" target="_blank">
+          <img class="thumb-xl img-circle img-rotate" src="https://ws4.sinaimg.cn/large/006tNc79gy1fhkma5ei3pj30ak0akt8w.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Jimmy</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="fa fa-map-marker"></i> Nanjin, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat"><i class="fa fa-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+            <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <!-- <span class="ins-close ins-selectable"><i class="fa fa-times"></i></span> -->
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav">
+        
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="fa fa-fw fa-dashboard"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="fa fa-fw fa-delicious"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="fa fa-fw fa-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="fa fa-fw fa-code"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="fa fa-fw fa-leanpub"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="fa fa-fw fa-gg"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="fa fa-fw fa-coffee"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jimmy9876" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="fa fa-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/u/3270306430" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="fa fa-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="fa fa-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            
+            <p>您好，您是第<span id="busuanzi_value_site_uv">0</span>位访客</p>
+            
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Sublime插件/">Sublime插件</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/">css</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo-blog/">hexo_blog</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mpv/">mpv</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/">mysql</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/node-js/">node.js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/php/">php</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue-js/">vue.js</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/操作系统/">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/笔试/">笔试</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/软件测试/">软件测试</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/阿里云ECS/">阿里云ECS</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C/" style="font-size: 13px;">C++</a> <a href="/tags/HTTP/" style="font-size: 13px;">HTTP</a> <a href="/tags/Hadoop/" style="font-size: 13px;">Hadoop</a> <a href="/tags/Sublime插件/" style="font-size: 13px;">Sublime插件</a> <a href="/tags/css/" style="font-size: 13px;">css</a> <a href="/tags/git/" style="font-size: 13.5px;">git</a> <a href="/tags/hexo/" style="font-size: 14px;">hexo</a> <a href="/tags/hexo-blog/" style="font-size: 13.5px;">hexo_blog</a> <a href="/tags/javascript/" style="font-size: 13.5px;">javascript</a> <a href="/tags/mpv/" style="font-size: 13px;">mpv</a> <a href="/tags/mysql/" style="font-size: 13px;">mysql</a> <a href="/tags/node-js/" style="font-size: 13px;">node.js</a> <a href="/tags/php/" style="font-size: 14px;">php</a> <a href="/tags/vue-js/" style="font-size: 14px;">vue.js</a> <a href="/tags/操作系统/" style="font-size: 13px;">操作系统</a> <a href="/tags/笔试/" style="font-size: 13px;">笔试</a> <a href="/tags/软件测试/" style="font-size: 13px;">软件测试</a> <a href="/tags/阿里云ECS/" style="font-size: 13px;">阿里云ECS</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">15</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2017/06/16/阿里云vps搭建自己的hexo博客/" class="title">阿里云vps搭建自己的hexo博客</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-06-16T11:44:20.000Z" itemprop="datePublished">2017-06-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2017/06/11/让你的hexo博客支持LaTex数学公式/" class="title">让你的hexo博客支持LaTex数学公式</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-06-11T08:21:20.000Z" itemprop="datePublished">2017-06-11</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2017/06/11/软件测试习题（更新ing）/" class="title">软件测试习题（更新ing）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-06-11T06:21:57.000Z" itemprop="datePublished">2017-06-11</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2017/06/07/Emmet-WEB前端代码快速编写神器/" class="title">Emmet:WEB前端代码快速编写神器</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-06-07T05:30:09.000Z" itemprop="datePublished">2017-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2017/06/06/同花顺笔试题精选/" class="title">同花顺笔试题精选</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2017-06-06T13:23:56.000Z" itemprop="datePublished">2017-06-06</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-php模拟登陆实现课表抓取-最新版" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      php模拟登陆实现课表抓取(最新版)
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="fa fa-calendar-check-o"></i>
+	<a href="/2017/05/26/php模拟登陆实现课表抓取-最新版/" class="article-date">
+	  <time datetime="2017-05-26T07:13:01.000Z" itemprop="datePublished">2017-05-26</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="fa fa-tag"></i>
+	<a class="article-tag-link" href="/tags/php/">php</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="fa fa-eye" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			阅读<span id="busuanzi_value_page_pv">0</span>次
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="fa fa-commenting-o"></i> <a href="/2017/05/26/php模拟登陆实现课表抓取-最新版/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+      
+    </div>
+    <div class="article-entry markdown-body" itemprop="articleBody">
+      
+        <blockquote>
+<p>首先，简单的说下表单原理，当我们在正方输入学号、密码、验证码的时候，点击提交按钮会产生一个POST请求，服务器在接受到POST请求以后，检查提交的学号密码验证码是否正确，正确则登陆成功。</p>
+</blockquote>
+<p>环境：Mac+MAMP Pro+phpstorm(PHP7.1)+Chrome</p>
+<h2 id="1、抓包"><a href="#1、抓包" class="headerlink" title="1、抓包"></a>1、抓包</h2><p>打开谷歌浏览器访问学校教务处网址，打开开发者工具选择network，之后在正方里填上你的学号，密码，验证码，登录，看看这期间提交的数据。</p>
+<p><img src="http://i1.piimg.com/588926/fa6f6f661397058c.jpg" alt=""></p>
+<p>我们要用到的数据只有default2.aspx和xs_main.aspx?xh=”你的学号”这两个，其余的都是修饰用的css文件。点开default2.aspx可以看到你提交的表单数据。</p>
+<p><img src="http://i1.piimg.com/588926/e2468014006c83be.jpg" alt=""></p>
+<p>其中__VIEWSTATE是asp.net服务器的状态信息，需要抓取出来。<br>另外default2.aspx这个页面采用了302跳转，即登录成功后会跳转到xs_main.aspx?xh=”你的学号”这个网址，这一点可能是大多数人模拟登录失败的原因。</p>
+<h2 id="2、构造登录页面"><a href="#2、构造登录页面" class="headerlink" title="2、构造登录页面"></a>2、构造登录页面</h2><p>三项信息必填，学号、密码、验证码。先说说验证码怎么保存到本地。</p>
+<p><img src="http://i4.buimg.com/588926/7d45a6e1eff2d946.jpg" alt=""></p>
+<p>验证码是由一个叫checkcode.aspx的网页生成的，要保存可以用<code>fwrite</code>来实现。直接用<code>&lt;img src=&quot;&quot;</code>填上刚才的网址理论上也可以，只要你能保存下这张图片所对应的cookie，这个cookie决定了你是否能够进行后续数据抓取。</p>
+<p>具体代码如下：</p>
+<p>首先要新建一个cookie文件夹，并且把session打开（可以解决高并发访问时登陆失败的问题）。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span> </div><div class="line">    session_start();</div><div class="line">    $id=session_id();</div><div class="line">    $_SESSION[<span class="string">'id'</span>]=$id;</div><div class="line"><span class="meta">?&gt;</span></div></pre></td></tr></table></figure>
+<p>验证码保存：</p>
+<p>这里注意⚠️要自己新建一个<code>cookie</code>文件夹📁在你的项目目录。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span> </div><div class="line">  	$cookie = dirname(<span class="keyword">__FILE__</span>) . <span class="string">'/cookie/'</span>.$_SESSION[<span class="string">'id'</span>].<span class="string">'.txt'</span>; <span class="comment">//cookie路径</span></div><div class="line">	$verify_code_url = <span class="string">"http://你的正方网址/CheckCode.aspx"</span>; <span class="comment">//验证码地址</span></div><div class="line">	$curl = curl_init();</div><div class="line">	curl_setopt($curl, CURLOPT_URL, $verify_code_url);</div><div class="line">	curl_setopt($curl, CURLOPT_COOKIEJAR, $cookie);  <span class="comment">//保存cookie</span></div><div class="line">	curl_setopt($curl, CURLOPT_HEADER, <span class="number">0</span>);</div><div class="line">	curl_setopt($curl, CURLOPT_RETURNTRANSFER, <span class="number">1</span>);</div><div class="line">	$img = curl_exec($curl);  <span class="comment">//执行curl</span></div><div class="line">	curl_close($curl);</div><div class="line">	$fp = fopen(<span class="string">"verifyCode.jpg"</span>,<span class="string">"w"</span>);  <span class="comment">//文件名</span></div><div class="line">	fwrite($fp,$img);  <span class="comment">//写入文件</span></div><div class="line">	fclose($fp);</div><div class="line"><span class="meta">?&gt;</span></div></pre></td></tr></table></figure>
+<p>之后构造<code>input</code>表单，设置好<code>name</code></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">"form1"</span> <span class="attr">method</span>=<span class="string">"post"</span> <span class="attr">action</span>=<span class="string">"kebiao.php"</span> &gt;</span></div><div class="line">    用户名:<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"xh"</span> /&gt;</span><span class="comment">&lt;!--普通文本框--&gt;</span></div><div class="line">    密码:<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="attr">name</span>=<span class="string">"pw"</span> /&gt;</span><span class="comment">&lt;!--密码框--&gt;</span></div><div class="line">    验证码:<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"code"</span> /&gt;</span><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"verifyCode.jpg"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span> <span class="attr">value</span>=<span class="string">"提交信息"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="3、后端模拟登录页面"><a href="#3、后端模拟登录页面" class="headerlink" title="3、后端模拟登录页面"></a>3、后端模拟登录页面</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;?php</span></div><div class="line"><span class="comment">/**</span></div><div class="line"><span class="comment"> * Created by PhpStorm.</span></div><div class="line"><span class="comment"> * User: Apple</span></div><div class="line"><span class="comment"> * Date: 2019/5/17</span></div><div class="line"><span class="comment"> * Time: PM9:08</span></div><div class="line"><span class="comment"> */</span></div><div class="line">session_start();</div><div class="line">header(<span class="string">"Content-type: text/html; charset=gb2312"</span>);  <span class="comment">//视学校而定，博主学校是gbk编码，php也采用的gbk编码方式</span></div><div class="line"></div><div class="line"><span class="comment">//将表格转换成数组函数</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">get_td_array</span><span class="params">($table)</span> </span>&#123;</div><div class="line">    $table = preg_replace(<span class="string">"'&lt;table[^&gt;]*?&gt;'si"</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = preg_replace(<span class="string">"'&lt;tr[^&gt;]*?&gt;'si"</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = preg_replace(<span class="string">"'&lt;td[^&gt;]*?&gt;'si"</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = str_replace(<span class="string">"&lt;/tr&gt;"</span>,<span class="string">"&#123;tr&#125;"</span>,$table);</div><div class="line">    $table = str_replace(<span class="string">"&lt;/td&gt;"</span>,<span class="string">"&#123;td&#125;"</span>,$table);</div><div class="line">    <span class="comment">//去掉 HTML 标记</span></div><div class="line">    $table = preg_replace(<span class="string">"'&lt;[/!]*?[^&lt;&gt;]*?&gt;'si"</span>,<span class="string">""</span>,$table);</div><div class="line">    <span class="comment">//去掉空白字符</span></div><div class="line">    $table = preg_replace(<span class="string">"'([rn])[s]+'"</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = preg_replace(<span class="string">'/&amp;nbsp;/'</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = str_replace(<span class="string">" "</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = str_replace(<span class="string">" "</span>,<span class="string">""</span>,$table);</div><div class="line">    $table = explode(<span class="string">'&#123;tr&#125;'</span>, $table);</div><div class="line">    array_pop($table);</div><div class="line">    <span class="keyword">foreach</span> ($table <span class="keyword">as</span> $key=&gt;$tr) &#123;</div><div class="line">        $td = explode(<span class="string">'&#123;td&#125;'</span>, $tr);</div><div class="line">        array_pop($td);</div><div class="line">        $td_array[] = $td;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> $td_array;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">login_post</span><span class="params">($url, $cookie, $post)</span></span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    $ch = curl_init();</div><div class="line">    curl_setopt($ch, CURLOPT_URL, $url);</div><div class="line">    curl_setopt($ch, CURLOPT_HEADER, <span class="number">0</span>);</div><div class="line">    curl_setopt($ch, CURLOPT_RETURNTRANSFER, <span class="number">1</span>);  <span class="comment">//不自动输出数据，要echo才行</span></div><div class="line">    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, <span class="number">1</span>);  <span class="comment">//重要，抓取跳转后数据</span></div><div class="line">    curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie);</div><div class="line">    curl_setopt($ch, CURLOPT_REFERER, <span class="string">'http://202.119.225.34/'</span>);  <span class="comment">//重要，302跳转需要referer，可以在Request Headers找到</span></div><div class="line">    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);  <span class="comment">//post提交数据</span></div><div class="line">    $result = curl_exec($ch);</div><div class="line"><span class="comment">//    $content = curl_getinfo($ch);</span></div><div class="line"><span class="comment">//    echo json_encode($content);</span></div><div class="line">    curl_close($ch);</div><div class="line">    <span class="keyword">return</span> $result;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$_SESSION[<span class="string">'xh'</span>] = $_POST[<span class="string">'xh'</span>];</div><div class="line">$xh = $_POST[<span class="string">'xh'</span>];</div><div class="line">$pw = $_POST[<span class="string">'pw'</span>];</div><div class="line">$code = $_POST[<span class="string">'code'</span>];</div><div class="line">$cookie = dirname(<span class="keyword">__FILE__</span>) . <span class="string">'/cookie/'</span> . $_SESSION[<span class="string">'id'</span>] . <span class="string">'.txt'</span>;</div><div class="line">$url = <span class="string">"http://202.119.225.34/default2.aspx"</span>;</div><div class="line">$con1=login_post($url,$cookie,<span class="string">''</span>);</div><div class="line">    preg_match_all(<span class="string">'/&lt;input type="hidden" name="__VIEWSTATE" value="([^&lt;&gt;]+)" \/&gt;/'</span>, $con1, $view); <span class="comment">//获取__VIEWSTATE字段并存到$view数组中</span></div><div class="line">    $post=<span class="keyword">array</span>(</div><div class="line">        <span class="string">'__VIEWSTATE'</span>=&gt;$view[<span class="number">1</span>][<span class="number">0</span>],</div><div class="line">        <span class="string">'txtUserName'</span>=&gt;$xh,</div><div class="line">        <span class="string">'TextBox2'</span>=&gt;$pw,</div><div class="line">        <span class="string">'txtSecretCode'</span>=&gt;$code,</div><div class="line">        <span class="string">'RadioButtonList1'</span>=&gt;<span class="string">'%D1%A7%C9%FA'</span>,  <span class="comment">//“学生”的gbk编码</span></div><div class="line">        <span class="string">'Button1'</span>=&gt;<span class="string">''</span>,</div><div class="line">        <span class="string">'lbLanguage'</span>=&gt;<span class="string">''</span>,</div><div class="line">        <span class="string">'hidPdrs'</span>=&gt;<span class="string">''</span>,</div><div class="line">        <span class="string">'hidsc'</span>=&gt;<span class="string">''</span></div><div class="line">    );</div><div class="line">    $con2=login_post($url,$cookie,http_build_query($post)); <span class="comment">//将数组连接成字符串</span></div><div class="line">    preg_match_all(<span class="string">'/&lt;span id="xhxm"&gt;([^&lt;&gt;]+)/'</span>, $con2, $xm);</div><div class="line">	$xm[<span class="number">1</span>][<span class="number">0</span>] = substr($xm[<span class="number">1</span>][<span class="number">0</span>], <span class="number">0</span>, <span class="number">-4</span>);</div><div class="line">$url2 = <span class="string">"http://202.119.225.34/xskbcx.aspx?xh="</span> . $_SESSION[<span class="string">'xh'</span>] . <span class="string">"&amp;xm="</span> . $xm[<span class="number">1</span>][<span class="number">0</span>];</div><div class="line">$con3 = login_post($url2, $cookie, <span class="string">''</span>);</div><div class="line"></div><div class="line"><span class="comment">//echo $con3;</span></div><div class="line">print_r($con3);</div><div class="line"><span class="meta">?&gt;</span></div></pre></td></tr></table></figure>
+<p>如果代码都正确，你将看到如下页面</p>
+<p><img src="http://i4.buimg.com/588926/eda145ce10fe2f0a.png" alt=""></p>
+<p><img src="http://i4.buimg.com/588926/fad605f358e06ff5.png" alt=""></p>
+<p>课表成功拿到。</p>
+<p>同理可以用正则表达式拿到成绩等，可以用这些数据做个微信公众号用来查询成绩课表等等。这些以后有时间再深入了解。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://jimmy9876.top/2017/05/26/php模拟登陆实现课表抓取-最新版/" title="php模拟登陆实现课表抓取(最新版)" target="_blank" rel="external">http://jimmy9876.top/2017/05/26/php模拟登陆实现课表抓取-最新版/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/jimmy9876" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="https://ws4.sinaimg.cn/large/006tNc79gy1fhkma5ei3pj30ak0akt8w.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/jimmy9876" target="_blank"><span class="text-dark">Jimmy</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+       
+    <div id="uyan_frame"></div>
+
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2017/05/27/用vue-js开发一个TodoList-1/" title="用vue.js开发一个TodoList(1)"><i class="fa fa-angle-left" aria-hidden="true"></i>&nbsp;&nbsp;上一篇</a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2017/05/26/hello-world/" title="正方自动测评javascript脚本">下一篇&nbsp;&nbsp;<i class="fa fa-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning hidden-xs" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  
+  
+  <div class="bar-right">
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+  </div>
+  
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-tit">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="donate-payimg">
+            <img src="https://ws4.sinaimg.cn/large/006tNc79gy1fhkmv687k9j30p011igp3.jpg" alt="扫码支持" title="扫一扫" />
+          </div>
+          <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+          <div class="donate-payselect">
+            <div class="pay_item checked" data-id="alipay" data-src="https://ws4.sinaimg.cn/large/006tNc79gy1fhkmv687k9j30p011igp3.jpg">
+              <div class="radio">
+                <input type="radio" name="payment" id="input-alipay" value="alipay" checked>
+                <label class="pay_logo clickable" for="input-alipay"><img src="/images/donate/alipay.jpg" alt="支付宝" /></label>
+              </div>
+            </div>
+            <div class="pay_item" data-id="weipay" data-src="https://ws2.sinaimg.cn/large/006tNc79gy1fhkmv31ewjj30yi1auwj9.jpg">
+              <div class="radio">
+                <input type="radio" name="payment" id="input-weipay" value="weipay">
+                <label class="pay_logo clickable" for="input-weipay"><img src="/images/donate/weipay.jpg" alt="微信支付" /></label>
+              </div>
+            </div>
+          </div>
+          <div class="text-grey">
+            <p>打开<span id="donate-pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/jimmy9876" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="fa fa-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/u/3270306430" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="fa fa-weibo"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="fa fa-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.js"></script>
+<script src="/js/application.js"></script>
+  
+    
+    
+    
+        <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+    
+    
+        
+<script defer src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+    
+    
+        
+    
+    <script defer type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=[object Object]"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+    
+    
+
+
+
+</body>
+</html>
