@@ -6,29 +6,26 @@ comments: false
 sidebar: custom
 ---
 
-<center>我是*Jimmy*</center>
 
-<center>目前就读于南京邮电大学</center>
+我是 *Jimmy*
 
-<center>是一名大三学生</center>
+目前就读于南京邮电大学
 
-<center>热爱前端后端各种技术</center>
+是一名应届生
 
-<center>喜欢折腾</center>
+热爱前端后端各种技术
 
-<center>最近潜心学习PHP的Laravel框架</center>
+QQ: 370555337
 
-<center>QQ:370555337</center>
+E-mail: aimpeter@163.com
 
-<center>E-mail:aimpeter@163.com</center>
+<!-- <center>个人网站:</center>
 
-<center>个人网站:</center>
+<center> (1)[abc社区](http://119.23.33.174) </center>
 
-<center>(1)[abc社区](http://119.23.33.174)</center>
+<center> (2)[小游戏网站](http://aimpeter.xyz) </center>
 
-<center>(2)[小游戏网站](http://aimpeter.xyz)</center>
-
-<center>(3)[个人博客](http://jimmy9876.top)</center>
+<center> (3)[个人博客](http://jimmy9876.top) </center> -->
 
 <!-- <center><span color="red">**如果我的文章节省了你的时间，欢迎赏根🍭**</span></center>
 
