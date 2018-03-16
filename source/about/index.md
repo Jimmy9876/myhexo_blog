@@ -23,7 +23,7 @@ E-mail: aimpeter@163.com
 
 <center> (1)[abc社区](http://119.23.33.174) </center>
 
-<center> (2)[小游戏网站](http://aimpeter.xyz) </center>
+<center> (2)[小游戏网站](http://codenoter.com) </center>
 
 <center> (3)[个人博客](http://jimmy9876.top) </center> -->
 
